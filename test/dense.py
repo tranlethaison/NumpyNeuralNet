@@ -12,11 +12,10 @@ from numpynn.initializers import RandomNormal, RandomUniform, Zeros, StandardNor
 from numpynn.models import Model
 from numpynn.optimizers import SGD
 from numpynn.losses import MSE, CrossEntropy, LogLikelihood
-from numpynn.regularizers import L2
+from numpynn.regularizers import L2, L1
 
 
 def sigmoid_mse():
-    """Train Sigmoid-MSE model."""
     inputs = Dense(784)
     x = Dense(
         30,
@@ -37,7 +36,6 @@ def sigmoid_mse():
 
 
 def sigmoid_cross_entropy():
-    """Train Sigmoid-Cross_Entropy model."""
     inputs = Dense(784)
     x = Dense(
         30,
@@ -58,7 +56,6 @@ def sigmoid_cross_entropy():
 
 
 def softmax_loglikelihood():
-    """Train Softmax-Log_likelihood model."""
     inputs = Dense(784)
     x = Dense(
         30,
@@ -97,7 +94,8 @@ def train(model, cfg):
 
     model.compile(
         #optimizer=SGD(cfg["lr"]), loss=cfg["loss"], n_classes=10, regularizer=None
-        optimizer=SGD(cfg["lr"]), loss=cfg["loss"], n_classes=10, regularizer=L2(5.0)
+        #optimizer=SGD(cfg["lr"]), loss=cfg["loss"], n_classes=10, regularizer=L2(5e-5)
+        optimizer=SGD(cfg["lr"]), loss=cfg["loss"], n_classes=10, regularizer=L1(5e-5)
     )
     model.fit(x_train, y_train, batch_size=10, n_epochs=30, val_data=(x_val, y_val))
     accuracy = model.evaluate(x_test, y_test)
@@ -123,7 +121,8 @@ def overfit_test(model, cfg):
 
     model.compile(
         #optimizer=SGD(cfg["lr"]), loss=cfg["loss"], n_classes=10, regularizer=None
-        optimizer=SGD(cfg["lr"]), loss=cfg["loss"], n_classes=10, regularizer=L2(0.1)
+        #optimizer=SGD(cfg["lr"]), loss=cfg["loss"], n_classes=10, regularizer=L2(5e-5)
+        optimizer=SGD(cfg["lr"]), loss=cfg["loss"], n_classes=10, regularizer=L1(5e-5)
     )
     model.fit(x_train, y_train, batch_size=10, n_epochs=400, val_data=(x_val, y_val))
     accuracy = model.evaluate(x_test, y_test)

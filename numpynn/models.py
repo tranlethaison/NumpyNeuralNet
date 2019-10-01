@@ -34,7 +34,6 @@ class Model:
 
     def fit(self, x, y, batch_size=None, n_epochs=1, val_data=None):
         assert len(x) == len(y)
-        n = len(x)
 
         vis = Visualizer(n_epochs)
 
@@ -56,12 +55,10 @@ class Model:
 
                 y_test_onehot = np.eye(self.n_classes)[y_test]
                 a_test = self.predict(x_test)
-                if self.regularizer:
-                    weights = [layer.weights for layer in self.layers[1:]]
-                    regularization = self.regularizer(n, weights)
-                else:
-                    regularization = 0
 
+                regularization = self.regularizer(
+                    [layer.weights for layer in self.layers[1:]]
+                )
                 val_loss = self.loss.f(y_test_onehot.T, a_test.T) + regularization
 
                 val_accu = self.evaluate(x_test, y_test)

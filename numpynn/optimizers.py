@@ -19,8 +19,6 @@ class SGD:
         x = x[ids, ...]
         y = y[ids, ...]
 
-        n = len(x)
-
         batches = [
             (x[i : i + batch_size, ...], y[i : i + batch_size, ...])
             for i in range(0, len(x), batch_size)
@@ -42,12 +40,9 @@ class SGD:
                 )
                 a[l] = model.layers[l].activation.f(z[l])
 
-            if model.regularizer:
-                weights = [layer.weights for layer in model.layers[1:]]
-                regularization = model.regularizer(n, weights)
-            else:
-                regularization = 0
-
+            regularization = model.regularizer(
+                [layer.weights for layer in model.layers[1:]]
+            )
             losses[bid] = model.loss.f(y, a[-1]) + regularization
 
             # Ouput error
@@ -82,12 +77,11 @@ class SGD:
 
             # Gradient Descent
             m = x.shape[-1]
-            if model.regularizer:
-                weight_scale_factor = model.regularizer.weight_scale_factor(self.lr, n) 
-            else:
-                weight_scale_factor = 1
 
             for l in range(1, len(model.layers)):
+                weight_scale_factor = model.regularizer.weight_scale_factor(
+                    self.lr, model.layers[l].weights 
+                ) 
                 model.layers[l].weights = ( 
                     weight_scale_factor 
                     * model.layers[l].weights 
