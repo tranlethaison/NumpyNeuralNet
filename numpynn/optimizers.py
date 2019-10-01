@@ -84,16 +84,12 @@ class SGD:
 
             for l in range(1, len(model.layers)):
                 if model.regularizer:
-                    weight_scale_factor = model.regularizer.weight_scale_factor(
-                        self.lr, model.layers[l].weights 
-                    ) 
+                    weights = model.regularizer.shrink(self.lr, model.layers[l].weights) 
                 else:
-                    weight_scale_factor = 1
+                    weights = model.layers[l].weights
 
                 model.layers[l].weights = ( 
-                    weight_scale_factor 
-                    * model.layers[l].weights 
-                    - self.lr / m * np.matmul(delta[l], a[l - 1].T)
+                    weights - self.lr * np.matmul(delta[l], a[l - 1].T) / m
                 )
 
                 model.layers[l].bias -= self.lr * np.mean(delta[l], axis=-1, keepdims=1)

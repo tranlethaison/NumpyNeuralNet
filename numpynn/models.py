@@ -3,6 +3,7 @@ from collections import deque
 import numpy as np
 import matplotlib.pyplot as plt
 
+from .layers import *
 from .visualizer import Visualizer
 
 
@@ -19,18 +20,21 @@ class Model:
         self.n_classes = n_classes
         self.regularizer = regularizer
 
-        layers = deque()
-        x = self.outputs
+        self.layers = []
+        x = self.inputs
         while 1:
-            if not hasattr(x, "prior_layer"):
-                break
-            x.init_bias()
-            x.init_weights()
+            if not isinstance(x, (Input, Dropout)):
+                x.init_bias()
+                x.init_weights()
 
-            layers.appendleft(x)
-            x = x.prior_layer
-        layers.appendleft(self.inputs)
-        self.layers = list(layers)
+            self.layers.append(x)
+
+            if hasattr(x, "next_layer"):
+                x = x.next_layer
+            else:
+                break
+
+        assert self.layers[-1] is self.outputs
 
     def fit(self, x, y, batch_size=None, n_epochs=1, val_data=None):
         assert len(x) == len(y)

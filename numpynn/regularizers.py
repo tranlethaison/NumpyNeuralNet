@@ -11,8 +11,10 @@ class L2:
         sum_squared_weights = np.sum([np.sum(w ** 2) for w in all_weights])
         return self.lmbda * sum_squared_weights
 
-    def weight_scale_factor(self, lr, weights=None):
-        return 1 - lr * self.lmbda * 2
+    def shrink(self, lr, weights):
+        if self.lmbda == 0:
+            return weights
+        return weights * (1 - lr * self.lmbda * 2)
 
 
 class L1:
@@ -25,7 +27,7 @@ class L1:
         sum_abs_weights = np.sum([np.sum(abs(w)) for w in all_weights])
         return self.lmbda * sum_abs_weights
 
-    def weight_scale_factor(self, lr, weights):
+    def shrink(self, lr, weights):
         if self.lmbda == 0:
-            return 1
-        return 1 - lr * self.lmbda / np.abs(weights)
+            return weights
+        return weights - lr * self.lmbda * np.sign(weights)
