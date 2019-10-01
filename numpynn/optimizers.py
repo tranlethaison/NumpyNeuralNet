@@ -40,9 +40,13 @@ class SGD:
                 )
                 a[l] = model.layers[l].activation.f(z[l])
 
-            regularization = model.regularizer(
-                [layer.weights for layer in model.layers[1:]]
-            )
+            if model.regularizer:
+                regularization = model.regularizer(
+                    [layer.weights for layer in model.layers[1:]]
+                )
+            else:
+                regularization = 0
+
             losses[bid] = model.loss.f(y, a[-1]) + regularization
 
             # Ouput error
@@ -79,9 +83,13 @@ class SGD:
             m = x.shape[-1]
 
             for l in range(1, len(model.layers)):
-                weight_scale_factor = model.regularizer.weight_scale_factor(
-                    self.lr, model.layers[l].weights 
-                ) 
+                if model.regularizer:
+                    weight_scale_factor = model.regularizer.weight_scale_factor(
+                        self.lr, model.layers[l].weights 
+                    ) 
+                else:
+                    weight_scale_factor = 1
+
                 model.layers[l].weights = ( 
                     weight_scale_factor 
                     * model.layers[l].weights 

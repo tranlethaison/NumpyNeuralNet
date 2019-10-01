@@ -56,11 +56,14 @@ class Model:
                 y_test_onehot = np.eye(self.n_classes)[y_test]
                 a_test = self.predict(x_test)
 
-                regularization = self.regularizer(
-                    [layer.weights for layer in self.layers[1:]]
-                )
-                val_loss = self.loss.f(y_test_onehot.T, a_test.T) + regularization
+                if self.regularizer: 
+                    regularization = self.regularizer(
+                        [layer.weights for layer in self.layers[1:]]
+                    )
+                else:
+                    regularization = 0
 
+                val_loss = self.loss.f(y_test_onehot.T, a_test.T) + regularization
                 val_accu = self.evaluate(x_test, y_test)
                 print("Val_loss: {}\tVal_accu: {}".format(val_loss, val_accu))
             print()

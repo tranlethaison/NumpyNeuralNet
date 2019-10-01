@@ -1,4 +1,5 @@
 numpy
+keras
 tqdm
 matplotlib
 fire
