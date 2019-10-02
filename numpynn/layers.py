@@ -32,11 +32,13 @@ class Dense(Base):
         activation=Linear,
         kernel_initializer=RandomNormal(),
         bias_initializer=Zeros(),
+        kernel_regularizer=None,
     ):
         self.units = units
         self.activation = activation
         self.kernel_initializer = kernel_initializer
         self.bias_initializer = bias_initializer
+        self.kernel_regularizer = kernel_regularizer
 
     def init_bias(self):
         self.bias = self.bias_initializer(shape=(self.units, 1), dtype=np.float64)
@@ -57,6 +59,19 @@ class Dense(Base):
             np.matmul(self.next_layer.weights.T, self.next_layer.errors)
             * self.activation.df(self.affines)
         )
+
+    def update(self, lr, m):
+        if self.kernel_regularizer:
+            self.weights = self.kernel_regularizer.shrink(lr, self.weights)
+
+        self.weights -= lr * np.matmul(self.errors, self.prior_layer.activations.T) / m
+
+        self.bias -= lr * np.sum(self.errors, axis=-1, keepdims=True) / m
+
+    def regularization(self):
+        if self.kernel_regularizer:
+            return self.kernel_regularizer(self.weights)
+        return 0
 
 
 class Dropout(Base):

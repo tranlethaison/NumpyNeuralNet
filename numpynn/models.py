@@ -14,11 +14,10 @@ class Model:
         self.inputs = inputs
         self.outputs = outputs
 
-    def compile(self, optimizer, loss, n_classes, regularizer):
+    def compile(self, optimizer, loss, n_classes):
         self.optimizer = optimizer
         self.loss = loss
         self.n_classes = n_classes
-        self.regularizer = regularizer
 
         self.layers = []
         x = self.inputs
@@ -61,6 +60,9 @@ class Model:
                 a_test = self.predict(x_test)
 
                 val_loss = self.loss.f(y_test_onehot.T, a_test.T)
+                for l in range(1, len(self.layers)):
+                    val_loss += self.layers[l].regularization()
+
                 val_accu = self.evaluate(x_test, y_test)
                 print("Val_loss: {}\tVal_accu: {}".format(val_loss, val_accu))
             print()

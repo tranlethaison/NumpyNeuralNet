@@ -35,7 +35,10 @@ class SGD:
             for l in range(1, len(model.layers)):
                 model.layers[l].forward(is_training=True)
 
+            # Loss
             losses[bid] = model.loss.f(y, model.outputs.activations)
+            for l in range(1, len(model.layers)):
+                losses[bid] += model.layers[l].regularization()
 
             # Backpropagate
             model.outputs.errors = self.ouput_errors(model, y)
@@ -48,16 +51,8 @@ class SGD:
             for l in range(1, len(model.layers)):
                 if isinstance(model.layers[l], Dropout):
                     continue
-
-                model.layers[l].weights -= (
-                    self.lr 
-                    * np.matmul(model.layers[l].errors, model.layers[l-1].activations.T) 
-                    / m
-                )
-
-                model.layers[l].bias -= (
-                    self.lr * np.sum(model.layers[l].errors, axis=-1, keepdims=1) / m
-                )
+                
+                model.layers[l].update(self.lr, m)
 
             p_batches.set_description("Batches")
         return np.mean(losses)

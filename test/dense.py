@@ -80,12 +80,14 @@ def softmax_loglikelihood():
         activation=Sigmoid,
         kernel_initializer=RandomNormal(),
         bias_initializer=Zeros(),
+        kernel_regularizer=L1(5e-5),
     )(inputs)
     outputs = Dense(
         10,
         activation=Softmax,
         kernel_initializer=RandomNormal(),
         bias_initializer=Zeros(),
+        kernel_regularizer=L2(5e-5),
     )(x)
 
     model = Model(inputs=inputs, outputs=outputs)
@@ -117,9 +119,7 @@ def softmax_loglikelihood_dropout():
 def train(model, cfg):
     (x_train, y_train), (x_val, y_val), (x_test, y_test) = data()
 
-    model.compile(
-        optimizer=SGD(cfg["lr"]), loss=cfg["loss"], n_classes=10, regularizer=None
-    )
+    model.compile(optimizer=SGD(cfg["lr"]), loss=cfg["loss"], n_classes=10)
     model.fit(x_train, y_train, batch_size=10, n_epochs=30, val_data=(x_val, y_val))
     accuracy = model.evaluate(x_test, y_test)
     print("Accuracy:", accuracy)
@@ -130,11 +130,7 @@ def overfit_test(model, cfg):
     n = 1000
     x_train, y_train = x_train[:n], y_train[:n]
 
-    model.compile(
-        #optimizer=SGD(cfg["lr"]), loss=cfg["loss"], n_classes=10, regularizer=None
-        #optimizer=SGD(cfg["lr"]), loss=cfg["loss"], n_classes=10, regularizer=L2(5e-5)
-        optimizer=SGD(cfg["lr"]), loss=cfg["loss"], n_classes=10, regularizer=L1(5e-5)
-    )
+    model.compile(optimizer=SGD(cfg["lr"]), loss=cfg["loss"], n_classes=10)
     model.fit(x_train, y_train, batch_size=10, n_epochs=400, val_data=(x_val, y_val))
     accuracy = model.evaluate(x_test, y_test)
     print("Accuracy:", accuracy)
