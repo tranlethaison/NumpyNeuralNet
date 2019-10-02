@@ -3,6 +3,7 @@ from tqdm import tqdm
 
 from .losses import *
 from .activations import *
+from .layers import *
 
 
 class SGD:
@@ -30,69 +31,52 @@ class SGD:
             x, y = x.T, y.T
 
             # Feedforward
-            z = [None] * len(model.layers)
-            a = [None] * len(model.layers)
-
-            a[0] = x
+            model.inputs.forward(x)
             for l in range(1, len(model.layers)):
-                z[l] = (
-                    np.matmul(model.layers[l].weights, a[l - 1]) + model.layers[l].bias
-                )
-                a[l] = model.layers[l].activation.f(z[l])
+                model.layers[l].forward(is_training=True)
 
-            if model.regularizer:
-                regularization = model.regularizer(
-                    [layer.weights for layer in model.layers[1:]]
-                )
-            else:
-                regularization = 0
-
-            losses[bid] = model.loss.f(y, a[-1]) + regularization
-
-            # Ouput error
-            delta = [None] * len(model.layers)
-
-            if (
-                model.loss is CrossEntropy
-                and model.layers[-1].activation is Sigmoid
-            ):
-                delta[-1] = a[-1] - y
-            elif (
-                model.loss is LogLikelihood
-                and model.layers[-1].activation is Softmax
-            ):
-                #j = np.argmax(y, axis=0)
-                #delta[-1] = (
-                #    model.loss.df_da(y, a[-1])
-                #    * model.layers[-1].activation.df(z[-1], j)
-                #)
-                delta[-1] = a[-1] - y
-            else:
-                delta[-1] = (
-                    model.loss.df_da(y, a[-1]) * model.layers[-1].activation.df(z[-1])
-                )
+            losses[bid] = model.loss.f(y, model.outputs.activations)
 
             # Backpropagate
+            model.outputs.errors = self.ouput_errors(model, y)
             for l in range(len(model.layers) - 2, 0, -1):
-                delta[l] = (
-                    np.matmul(model.layers[l + 1].weights.T, delta[l + 1])
-                    * model.layers[l].activation.df(z[l])
-                )
+                model.layers[l].backward()
 
             # Gradient Descent
             m = x.shape[-1]
 
             for l in range(1, len(model.layers)):
-                if model.regularizer:
-                    weights = model.regularizer.shrink(self.lr, model.layers[l].weights) 
-                else:
-                    weights = model.layers[l].weights
+                if isinstance(model.layers[l], Dropout):
+                    continue
 
-                model.layers[l].weights = ( 
-                    weights - self.lr * np.matmul(delta[l], a[l - 1].T) / m
+                model.layers[l].weights -= (
+                    self.lr 
+                    * np.matmul(model.layers[l].errors, model.layers[l-1].activations.T) 
+                    / m
                 )
 
-                model.layers[l].bias -= self.lr * np.mean(delta[l], axis=-1, keepdims=1)
+                model.layers[l].bias -= (
+                    self.lr * np.sum(model.layers[l].errors, axis=-1, keepdims=1) / m
+                )
 
             p_batches.set_description("Batches")
         return np.mean(losses)
+
+    def ouput_errors(self, model, y):
+        """Returns partial derivative of Loss wrt output affines."""
+        if (
+            model.loss is CrossEntropy
+            and model.outputs.activation is Sigmoid
+        ):
+            return model.outputs.activations - y
+
+        if (
+            model.loss is LogLikelihood
+            and model.outputs.activation is Softmax
+        ):
+            return model.outputs.activations - y
+
+        return (
+            model.loss.df_da(y, model.outputs.activations) 
+            * model.outputs.activation.df(model.outputs.affines)
+        )

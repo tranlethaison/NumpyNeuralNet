@@ -1,6 +1,7 @@
 # NumpyNeuralNet
 
-As [Richard Feynman](https://en.wikipedia.org/wiki/Richard_Feynman) said "What I cannot create, I do not understand.". So here we go.
+As [the man himself](https://en.wikipedia.org/wiki/Richard_Feynman) said "What I cannot create, I do not understand.".  
+So here we go, Neural Networks and training algorithms all in Numpy.
 
 ## Densely connected NN
     
@@ -13,7 +14,7 @@ Train a MNIST model with [output_activation]_[Loss].
 
 -   Sigmoid - Cross-entropy
     ```shell
-    $ python test/dense.py sigmoid_cross_entropy train
+    $ python test/dense.py sigmoid_crossentropy train
     ```
 
 -   Softmax - Log-likelihood
