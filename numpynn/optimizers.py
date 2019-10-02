@@ -47,11 +47,9 @@ class SGD:
 
             # Gradient Descent
             m = x.shape[-1]
-
             for l in range(1, len(model.layers)):
                 if isinstance(model.layers[l], Dropout):
                     continue
-                
                 model.layers[l].update(self.lr, m)
 
             p_batches.set_description("Batches")
