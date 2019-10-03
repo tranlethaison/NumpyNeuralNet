@@ -1,5 +1,7 @@
 # NumpyNeuralNet
 
+![](etc/machine_learning_2x.png)
+
 As [the man himself](https://en.wikipedia.org/wiki/Richard_Feynman) said "What I cannot create, I do not understand.".  
 So here we go, Neural Networks and training algorithms all in Numpy.
 

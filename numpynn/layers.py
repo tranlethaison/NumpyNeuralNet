@@ -5,8 +5,6 @@ from .initializers import Zeros, RandomNormal
 
 
 class Input:
-    """Input layer."""
-
     def __init__(self, units):
         self.units = units
 
@@ -24,8 +22,6 @@ class Base:
 
 
 class Dense(Base):
-    """Densely connected layer."""
-
     def __init__(
         self,
         units,
@@ -75,8 +71,6 @@ class Dense(Base):
 
 
 class Dropout(Base):
-    """Dropout layer."""
-
     def __init__(self, rate=0.5):
         self.rate = rate
 
