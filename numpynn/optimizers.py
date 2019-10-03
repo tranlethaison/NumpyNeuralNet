@@ -38,6 +38,8 @@ class SGD:
             # Loss
             losses[bid] = model.loss.f(y, model.outputs.activations)
             for l in range(1, len(model.layers)):
+                if not hasattr(model.layers[l], "regularization"):
+                    continue
                 losses[bid] += model.layers[l].regularization()
 
             # Backpropagate
@@ -48,7 +50,7 @@ class SGD:
             # Gradient Descent
             m = x.shape[-1]
             for l in range(1, len(model.layers)):
-                if isinstance(model.layers[l], Dropout):
+                if not hasattr(model.layers[l], "update"):
                     continue
                 model.layers[l].update(self.lr, m)
 

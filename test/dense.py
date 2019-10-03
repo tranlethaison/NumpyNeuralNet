@@ -8,7 +8,7 @@ sys.path.append(".")
 
 from numpynn.layers import Input, Dense, Dropout
 from numpynn.activations import Linear, Sigmoid, Softmax
-from numpynn.initializers import RandomNormal, RandomUniform, Zeros, StandardNormal
+from numpynn.initializers import Zeros, RandomNormal, RandomUniform 
 from numpynn.models import Model
 from numpynn.optimizers import SGD
 from numpynn.losses import MSE, CrossEntropy, LogLikelihood
@@ -54,18 +54,22 @@ def sigmoid_mse():
 
 
 def sigmoid_crossentropy():
-    inputs = Input(784)
+    n = 784
+
+    inputs = Input(n)
     x = Dense(
         30,
         activation=Sigmoid,
-        kernel_initializer=RandomNormal(),
+        kernel_initializer=RandomNormal(0, 1/(n ** 0.5)),
         bias_initializer=Zeros(),
+        kernel_regularizer=L2(5e-5),
     )(inputs)
     outputs = Dense(
         10,
         activation=Sigmoid,
-        kernel_initializer=RandomNormal(),
+        kernel_initializer=RandomNormal(0, 1/(n ** 0.5)),
         bias_initializer=Zeros(),
+        kernel_regularizer=L2(5e-5),
     )(x)
 
     model = Model(inputs=inputs, outputs=outputs)
@@ -74,18 +78,20 @@ def sigmoid_crossentropy():
 
 
 def softmax_loglikelihood():
-    inputs = Input(784)
+    n = 784
+
+    inputs = Input(n)
     x = Dense(
         30,
         activation=Sigmoid,
-        kernel_initializer=RandomNormal(),
+        kernel_initializer=RandomNormal(0, 1/(n ** 0.5)),
         bias_initializer=Zeros(),
-        kernel_regularizer=L1(5e-5),
+        kernel_regularizer=L2(5e-5),
     )(inputs)
     outputs = Dense(
         10,
         activation=Softmax,
-        kernel_initializer=RandomNormal(),
+        kernel_initializer=RandomNormal(0, 1/(n ** 0.5)),
         bias_initializer=Zeros(),
         kernel_regularizer=L2(5e-5),
     )(x)
@@ -96,19 +102,23 @@ def softmax_loglikelihood():
 
 
 def softmax_loglikelihood_dropout():
-    inputs = Input(784)
+    n = 784
+
+    inputs = Input(n)
     x = Dense(
         30,
         activation=Sigmoid,
-        kernel_initializer=RandomNormal(),
+        kernel_initializer=RandomNormal(0, 1/(n ** 0.5)),
         bias_initializer=Zeros(),
+        kernel_regularizer=L2(5e-5),
     )(inputs)
     x = Dropout(0.5)(x)
     outputs = Dense(
         10,
         activation=Softmax,
-        kernel_initializer=RandomNormal(),
+        kernel_initializer=RandomNormal(0, 1/(n ** 0.5)),
         bias_initializer=Zeros(),
+        kernel_regularizer=L2(5e-5),
     )(x)
 
     model = Model(inputs=inputs, outputs=outputs)

@@ -37,24 +37,26 @@ class Dense(Base):
         self.kernel_regularizer = kernel_regularizer
 
     def init_bias(self):
-        self.bias = self.bias_initializer(shape=(self.units, 1), dtype=np.float64)
+        self.bias = np.array(
+            [self.bias_initializer(shape=(1)) for _ in range(self.units)]
+        )
 
     def init_weights(self):
-        self.weights = self.kernel_initializer(
-            shape=(self.units, self.prior_layer.units), dtype=np.float64
+        self.weights = np.array(
+            [
+                self.kernel_initializer(shape=(self.prior_layer.units))
+                for _ in range(self.units)
+            ]
         )
 
     def forward(self, **kwargs):
-        self.affines = (
-            np.matmul(self.weights, self.prior_layer.activations) + self.bias
-        )
+        self.affines = np.matmul(self.weights, self.prior_layer.activations) + self.bias
         self.activations = self.activation.f(self.affines)
 
     def backward(self):
-        self.errors = (
-            np.matmul(self.next_layer.weights.T, self.next_layer.errors)
-            * self.activation.df(self.affines)
-        )
+        self.errors = np.matmul(
+            self.next_layer.weights.T, self.next_layer.errors
+        ) * self.activation.df(self.affines)
 
     def update(self, lr, m):
         if self.kernel_regularizer:
@@ -84,7 +86,7 @@ class Dropout(Base):
             np.hstack([np.zeros(n_drops), np.ones(self.units - n_drops)]), axis=-1
         )
         return self
-        
+
     def forward(self, is_training=False):
         if is_training:
             self.drops = np.random.permutation(self.drops)

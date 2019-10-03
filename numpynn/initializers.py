@@ -2,8 +2,8 @@ import numpy as np
 
 
 class Zeros:
-    def __call__(self, shape, dtype=None):
-        return np.zeros(shape=shape, dtype=dtype)
+    def __call__(self, shape):
+        return np.zeros(shape=shape)
 
 
 class RandomNormal:
@@ -20,10 +20,8 @@ class RandomNormal:
         self.loc = loc
         self.scale = scale
 
-    def __call__(self, shape, dtype=None):
-        return np.random.normal(loc=self.loc, scale=self.scale, size=shape).astype(
-            dtype
-        )
+    def __call__(self, shape):
+        return np.random.normal(loc=self.loc, scale=self.scale, size=shape)
 
 
 class RandomUniform:
@@ -40,12 +38,6 @@ class RandomUniform:
         self.low = low
         self.high = high
 
-    def __call__(self, shape, dtype=None):
-        return np.random.uniform(low=self.low, high=self.high, size=shape).astype(dtype)
+    def __call__(self, shape):
+        return np.random.uniform(low=self.low, high=self.high, size=shape)
 
-
-class StandardNormal:
-    """Return a sample (or samples) from the “standard normal” distribution.
-    """
-    def __call__(self, shape, dtype=None):
-        return np.random.randn(*shape).astype(dtype)
