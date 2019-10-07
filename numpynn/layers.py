@@ -7,6 +7,7 @@ from .initializers import Zeros, RandomNormal
 class Input:
     def __init__(self, units):
         self.units = units
+        self.trainable = False
 
     def forward(self, x):
         self.activations = x
@@ -35,6 +36,7 @@ class Dense(Base):
         self.kernel_initializer = kernel_initializer
         self.bias_initializer = bias_initializer
         self.kernel_regularizer = kernel_regularizer
+        self.trainable = True
 
     def init_bias(self):
         self.bias = np.array(
@@ -58,14 +60,6 @@ class Dense(Base):
             self.next_layer.weights.T, self.next_layer.errors
         ) * self.activation.df(self.affines)
 
-    def update(self, lr, m):
-        if self.kernel_regularizer:
-            self.weights = self.kernel_regularizer.shrink(lr, self.weights)
-
-        self.weights -= lr * np.matmul(self.errors, self.prior_layer.activations.T) / m
-
-        self.bias -= lr * np.sum(self.errors, axis=-1, keepdims=True) / m
-
     def regularization(self):
         if self.kernel_regularizer:
             return self.kernel_regularizer(self.weights)
@@ -75,6 +69,7 @@ class Dense(Base):
 class Dropout(Base):
     def __init__(self, rate=0.5):
         self.rate = rate
+        self.trainable = False
 
     def __call__(self, prior_layer):
         super().__call__(prior_layer)

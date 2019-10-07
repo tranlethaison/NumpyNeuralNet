@@ -61,7 +61,7 @@ class Model:
 
                 val_loss = self.loss.f(y_test_onehot.T, a_test.T)
                 for l in range(1, len(self.layers)):
-                    if not hasattr(self.layers[l], "regularization"):
+                    if not self.layers[l].trainable:
                         continue
                     val_loss += self.layers[l].regularization()
 

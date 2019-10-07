@@ -42,3 +42,14 @@ class Softmax:
             r[k[sid], sid] = -a[j[sid], sid] * a[k[sid], sid]
 
         return r
+
+
+class Tanh:
+    @staticmethod
+    def f(z):
+        exp_2z = np.exp(2 * z)
+        return (exp_2z - 1) / (exp_2z + 1)
+
+    @staticmethod
+    def df(z):
+        return 1 - np.square(Tanh.f(z))
