@@ -116,6 +116,33 @@ def softmax_loglikelihood():
     return model, cfg
 
 
+def relu_mse():
+    inputs = Input(784)
+    x = Dense(
+        30,
+        activation=ReLU,
+        kernel_initializer=RandomNormal(0, 1 / (784 ** 0.5)),
+        bias_initializer=Zeros(),
+        kernel_regularizer=L2(5e-5),
+    )(inputs)
+    # x = Dropout(0.5)(x)
+    outputs = Dense(
+        10,
+        activation=ReLU,
+        kernel_initializer=RandomNormal(0, 1 / (30 ** 0.5)),
+        bias_initializer=Zeros(),
+        kernel_regularizer=L2(5e-5),
+    )(x)
+
+    model = Model(inputs=inputs, outputs=outputs)
+    cfg = {
+        "optimizer": SGD(lr=0.25, momentum=0.2), 
+        "loss": MSE,
+        "scale": [0, 1],
+    }
+    return model, cfg
+
+
 def train(model, cfg):
     (x_train, y_train), (x_val, y_val), (x_test, y_test) = data(cfg["scale"])
 

@@ -53,3 +53,17 @@ class Tanh:
     @staticmethod
     def df(z):
         return 1 - np.square(Tanh.f(z))
+
+
+class ReLU:
+    @staticmethod
+    def f(z):
+        rv = z.copy()
+        rv[np.where(z <= 0)] = 0
+        return rv
+
+    @staticmethod
+    def df(z):
+        rv = np.ones(z.shape)
+        rv[np.where(z <= 0)] = 0
+        return rv
