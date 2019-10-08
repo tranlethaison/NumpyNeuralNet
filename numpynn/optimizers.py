@@ -86,14 +86,14 @@ class SGD:
             return model.outputs.activations - y
 
         return (
-            model.loss.df_da(y, model.outputs.activations) 
+            model.loss.df_da(y, model.outputs.activations)
             * model.outputs.activation.df(model.outputs.affines)
         )
 
     def update(self, model, l, m):
         # weights
         dcdw = (
-            np.matmul(model.layers[l].errors, model.layers[l].prior_layer.activations.T) 
+            np.matmul(model.layers[l].errors, model.layers[l].prior_layer.activations.T)
             / m
         )
         self.v_weights[l] = self.momentum * self.v_weights[l] - self.lr * dcdw

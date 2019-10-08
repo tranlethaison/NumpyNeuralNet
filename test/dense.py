@@ -56,7 +56,7 @@ def sigmoid_mse():
 
     model = Model(inputs=inputs, outputs=outputs)
     cfg = {
-        "optimizer": SGD(lr=3.0, momentum=0.0), 
+        "optimizer": SGD(lr=3.0, momentum=0.0),
         "loss": MSE,
         "scale": [0, 1],
     }
@@ -72,6 +72,20 @@ def sigmoid_crossentropy():
         bias_initializer=Zeros(),
         kernel_regularizer=L2(5e-5),
     )(inputs)
+    x = Dense(
+        30,
+        activation=Sigmoid,
+        kernel_initializer=RandomNormal(0, 1 / (30 ** 0.5)),
+        bias_initializer=Zeros(),
+        kernel_regularizer=L2(5e-5),
+    )(x)
+    x = Dense(
+        30,
+        activation=Sigmoid,
+        kernel_initializer=RandomNormal(0, 1 / (30 ** 0.5)),
+        bias_initializer=Zeros(),
+        kernel_regularizer=L2(5e-5),
+    )(x)
     outputs = Dense(
         10,
         activation=Sigmoid,
@@ -82,7 +96,7 @@ def sigmoid_crossentropy():
 
     model = Model(inputs=inputs, outputs=outputs)
     cfg = {
-        "optimizer": SGD(lr=0.5, momentum=0.2),
+        "optimizer": SGD(lr=0.1, momentum=0.2),
         "loss": CrossEntropy,
         "scale": [0, 1],
     }
@@ -109,7 +123,7 @@ def softmax_loglikelihood():
 
     model = Model(inputs=inputs, outputs=outputs)
     cfg = {
-        "optimizer": SGD(lr=0.5, momentum=0.2), 
+        "optimizer": SGD(lr=0.5, momentum=0.2),
         "loss": LogLikelihood,
         "scale": [0, 1],
     }
@@ -136,7 +150,7 @@ def relu_mse():
 
     model = Model(inputs=inputs, outputs=outputs)
     cfg = {
-        "optimizer": SGD(lr=0.25, momentum=0.2), 
+        "optimizer": SGD(lr=0.25, momentum=0.2),
         "loss": MSE,
         "scale": [0, 1],
     }
