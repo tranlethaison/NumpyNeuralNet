@@ -47,8 +47,9 @@ class Softmax:
 class Tanh:
     @staticmethod
     def f(z):
-        exp_2z = np.exp(2 * z)
-        return (exp_2z - 1) / (exp_2z + 1)
+        e_z = np.exp(z)
+        e_mz = 1 / e_z
+        return (e_z - e_mz) / (e_z + e_mz)
 
     @staticmethod
     def df(z):
